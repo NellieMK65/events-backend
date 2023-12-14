@@ -1,11 +1,21 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Response
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Event
-from schemas import EventSchema
+from models import Event, User, Booking
+from schemas import EventSchema, BookingSchema
 
 # initialize it
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(CORSMiddleware,
+                   allow_origins=origins,
+                    allow_credentials=True,
+                    allow_methods=["*"],
+                    allow_headers=["*"],
+    )
 
 # define a route
 @app.get('/')
@@ -59,5 +69,46 @@ def delete_event(event_id: int, db: Session = Depends(get_db)):
         db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+# creating a booking route
+@app.post('/booking')
+def book(booking: BookingSchema, db: Session = Depends(get_db)):
+    # 1. Check if user exists using the phone number
+    user = db.query(User).filter(User.phone == booking.phone).first()
+
+    if user == None:
+        # this means the user doesn`t exist so we create
+        user = User(name=booking.name, phone=booking.phone)
+        db.add(user)
+        db.commit()
+
+        # after creating user, now we can create a booking
+        saved_booking = Booking(booking_date=booking.booking_date,
+                          user_id= user.id,
+                          event_id = booking.event_id)
+
+        db.add(saved_booking)
+        db.commit()
+
+    else:
+        # check if the user has already booked for an event
+        saved_booking = db.query(Booking).filter(Booking.user_id == user.id,
+                                           Booking.event_id == booking.event_id)
+
+        if saved_booking == None:
+            # this means the user has not booked the event
+            saved_booking = Booking(booking_date=booking.booking_date,
+                          user_id= user.id,
+                          event_id = booking.event_id)
+
+            db.add(saved_booking)
+            db.commit()
+        else:
+            # if the user already has a booking we throw an error
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                                detail="Event already booked")
+
+
+    return {"message": "Event booked successfully"}
 
 

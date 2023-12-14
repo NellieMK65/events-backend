@@ -16,5 +16,6 @@ class UserSchema(BaseModel):
 
 class BookingSchema(BaseModel):
     event_id: int
-    user_id: int
+    name: str
+    phone: str
     booking_date: str
