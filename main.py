@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Response
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from database import get_db
 from models import Event, User, Booking
 from schemas import EventSchema, BookingSchema
@@ -31,7 +31,7 @@ def events(db: Session = Depends(get_db)):
 # get a single event
 @app.get('/events/{event_id}')
 def event(event_id: int, db: Session = Depends(get_db)):
-    event = db.query(Event).filter(Event.id == event_id).first()
+    event = db.query(Event).options(joinedload(Event.participants)).filter(Event.id == event_id).first()
 
     return event
 
@@ -93,7 +93,7 @@ def book(booking: BookingSchema, db: Session = Depends(get_db)):
     else:
         # check if the user has already booked for an event
         saved_booking = db.query(Booking).filter(Booking.user_id == user.id,
-                                           Booking.event_id == booking.event_id)
+                                           Booking.event_id == booking.event_id).first()
 
         if saved_booking == None:
             # this means the user has not booked the event
