@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from schemas import EventSchema
 
 # initialize it
 app = FastAPI()
@@ -20,7 +21,8 @@ def event():
 
 # create an event
 @app.post('/events')
-def create_event():
+def create_event(event: EventSchema):
+    print(event)
     return {"message": "Event created successfully"}
 
 # update an event
