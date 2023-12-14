@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from database import get_db
+from models import Event
 from schemas import EventSchema
 
 # initialize it
@@ -11,8 +14,9 @@ def index():
 
 # get all events
 @app.get('/events')
-def events():
-    return []
+def events(db: Session = Depends(get_db)):
+    events = db.query(Event).all()
+    return events
 
 # get a single event
 @app.get('/events/{event_id}')

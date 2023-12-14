@@ -10,11 +10,14 @@ class Event(Base):
 
     # define columns
     id = Column(Integer(), primary_key=True)
-    title = Column(Text())
-    description = Column(VARCHAR)
-    image = Column(VARCHAR)
-    location = Column(Text())
-    price = Column(Integer())
-    start_date = Column(DateTime())
-    end_date = Column(DateTime())
+    title = Column(Text(), nullable=False)
+    description = Column(VARCHAR, nullable=False)
+    image = Column(VARCHAR, nullable=False)
+    location = Column(Text(), nullable=False)
+    price = Column(Integer(), nullable=False)
+    start_date = Column(DateTime(), nullable=False)
+    end_date = Column(DateTime(), nullable=False)
     created_at = Column(TIMESTAMP)
+
+# the whole class represents a table, instances of the class represents a row
+# and attributes represents columnss
