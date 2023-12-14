@@ -13,3 +13,8 @@ class EventSchema(BaseModel):
 class UserSchema(BaseModel):
     name: str
     phone: str
+
+class BookingSchema(BaseModel):
+    event_id: int
+    user_id: int
+    booking_date: str
