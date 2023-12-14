@@ -21,3 +21,10 @@ class Event(Base):
 
 # the whole class represents a table, instances of the class represents a row
 # and attributes represents columnss
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer(), primary_key=True)
+    name = Column(Text(), nullable=False)
+    phone = Column(VARCHAR, nullable=False, unique=True)

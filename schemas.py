@@ -9,3 +9,7 @@ class EventSchema(BaseModel):
     price: int
     start_date: str
     end_date: str
+
+class UserSchema(BaseModel):
+    name: str
+    phone: str
